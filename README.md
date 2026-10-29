@@ -84,6 +84,8 @@ npm run dev               # http://localhost:5173
 
 ## Publicar online (deploy gratuito)
 
+**No ar:** front https://barberiq-pi.vercel.app · API https://barberiq-api.onrender.com/docs
+
 | Parte | Serviço | Configuração |
 |---|---|---|
 | Banco | **Neon** (ou Supabase) | crie o banco e copie a *connection string* (`postgresql://...?sslmode=require` serve como está) |

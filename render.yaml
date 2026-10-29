@@ -21,6 +21,8 @@ services:
         generateValue: true
       - key: AUTO_CREATE_TABLES
         value: "true"
+      - key: SEED_DEMO           # cria as contas de demonstração se o banco estiver vazio
+        value: "true"
       - key: TIMEZONE
         value: America/Sao_Paulo
       - key: LEMBRETES_INTERVALO_MIN

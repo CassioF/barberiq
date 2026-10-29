@@ -37,10 +37,29 @@ async def _loop_lembretes():
             log.exception("Erro no disparo automático de lembretes")
 
 
+def _seed_se_vazio():
+    with SessionLocal() as db:
+        if db.query(models.Usuario).first():
+            return
+    from app import seed
+    seed.popular()
+    log.info("Banco vazio: dados de demonstração criados (SEED_DEMO=true)")
+
+
+def _seed_seguro():
+    try:
+        _seed_se_vazio()
+    except Exception:
+        log.exception("Erro ao popular dados de demonstração")
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     if settings.AUTO_CREATE_TABLES:
         Base.metadata.create_all(bind=engine)
+    if settings.SEED_DEMO:
+        # em segundo plano, para não atrasar a abertura da porta (o Render espera por ela)
+        asyncio.get_running_loop().run_in_executor(None, _seed_seguro)
     tarefa = asyncio.create_task(_loop_lembretes()) if settings.LEMBRETES_INTERVALO_MIN > 0 else None
     yield
     if tarefa:
@@ -69,6 +88,6 @@ for r in (auth.router, clientes.router, barbeiros.router, barbeiros.disp, servic
     app.include_router(r)
 
 
-@app.get("/", tags=["Status"], summary="Verifica se a API está no ar")
+@app.api_route("/", methods=["GET", "HEAD"], tags=["Status"], summary="Verifica se a API está no ar")
 def raiz():
     return {"status": "ok", "servico": "AI Barbershop - API"}

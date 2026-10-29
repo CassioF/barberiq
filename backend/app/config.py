@@ -12,6 +12,9 @@ class Settings(BaseSettings):
     # Regex opcional de origens extras (ex.: previews do Vercel: https://barberiq.*\.vercel\.app)
     CORS_ORIGIN_REGEX: str = ""
     AUTO_CREATE_TABLES: bool = True
+    # Popula dados de demonstração ao iniciar, se o banco ainda não tiver usuários
+    # (útil no Render free, que não tem Shell para rodar "python -m app.seed")
+    SEED_DEMO: bool = False
     TIMEZONE: str = "America/Sao_Paulo"
     # Intervalo (min) do disparo automático de lembretes; 0 desliga
     LEMBRETES_INTERVALO_MIN: int = 15

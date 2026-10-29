@@ -91,7 +91,7 @@ npm run dev               # http://localhost:5173
 | Front | **Vercel** | *Root Directory* `frontend` · variável `VITE_API_URL=https://<sua-api>.onrender.com` |
 
 1. **Banco**: com `AUTO_CREATE_TABLES=true` a API cria as tabelas sozinha; ou aplique o schema: `psql "<url do Neon>" -f db/schema_barberiq.sql`.
-2. **API (Render)**: informe `DATABASE_URL` (Neon) e `CORS_ORIGINS` (URL do Vercel, ex.: `https://barberiq.vercel.app`). O `SECRET_KEY` é gerado automaticamente e o modelo de IA é treinado no build. Depois, rode o seed uma vez pelo *Shell* do Render: `python -m app.seed`. Teste em `https://<sua-api>.onrender.com/docs`.
+2. **API (Render)**: informe `DATABASE_URL` (Neon) e `CORS_ORIGINS` (URL do Vercel, ex.: `https://barberiq.vercel.app`). O `SECRET_KEY` é gerado automaticamente e o modelo de IA é treinado no build. Com `SEED_DEMO=true` (já no `render.yaml`), a API cria as contas de demonstração sozinha na primeira inicialização com o banco vazio — o plano free do Render não tem *Shell*. Teste em `https://<sua-api>.onrender.com/docs`.
 3. **Front (Vercel)**: o `frontend/vercel.json` faz as rotas do React Router (`/admin`, `/agendar`...) funcionarem ao recarregar a página. `VITE_API_URL` é lida no build: se mudar, faça *Redeploy*.
 
 > No plano gratuito o Render "dorme" após inatividade (1ª requisição demora ~1 min) e os lembretes automáticos não rodam enquanto ele dorme. Abra o site antes da apresentação e use o botão manual em *IA & Notificações*.

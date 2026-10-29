@@ -82,6 +82,20 @@ npm run dev               # http://localhost:5173
 - **Alembic** não foi configurado: o schema vem do `.sql` (ou de `AUTO_CREATE_TABLES=true`, que cria tabelas ausentes pelos models).
 - Não há fluxo de "esqueci a senha" nem pagamento (fora do escopo).
 
+## Publicar online (deploy gratuito)
+
+| Parte | Serviço | Configuração |
+|---|---|---|
+| Banco | **Neon** (ou Supabase) | crie o banco e copie a *connection string* (`postgresql://...?sslmode=require` serve como está) |
+| API | **Render** | *New + → Blueprint* → este repositório (usa o `render.yaml`) |
+| Front | **Vercel** | *Root Directory* `frontend` · variável `VITE_API_URL=https://<sua-api>.onrender.com` |
+
+1. **Banco**: com `AUTO_CREATE_TABLES=true` a API cria as tabelas sozinha; ou aplique o schema: `psql "<url do Neon>" -f db/schema_barberiq.sql`.
+2. **API (Render)**: informe `DATABASE_URL` (Neon) e `CORS_ORIGINS` (URL do Vercel, ex.: `https://barberiq.vercel.app`). O `SECRET_KEY` é gerado automaticamente e o modelo de IA é treinado no build. Depois, rode o seed uma vez pelo *Shell* do Render: `python -m app.seed`. Teste em `https://<sua-api>.onrender.com/docs`.
+3. **Front (Vercel)**: o `frontend/vercel.json` faz as rotas do React Router (`/admin`, `/agendar`...) funcionarem ao recarregar a página. `VITE_API_URL` é lida no build: se mudar, faça *Redeploy*.
+
+> No plano gratuito o Render "dorme" após inatividade (1ª requisição demora ~1 min) e os lembretes automáticos não rodam enquanto ele dorme. Abra o site antes da apresentação e use o botão manual em *IA & Notificações*.
+
 ## Testes
 ```bash
 cd backend && python -m pytest -q        # usa SQLite temporário

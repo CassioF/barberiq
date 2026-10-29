@@ -4,8 +4,19 @@ from sqlalchemy.orm import declarative_base, sessionmaker
 
 from app.config import settings
 
-_args = {"check_same_thread": False} if settings.DATABASE_URL.startswith("sqlite") else {}
-engine = create_engine(settings.DATABASE_URL, pool_pre_ping=True, connect_args=_args)
+
+def _normalizar_url(url: str) -> str:
+    """Provedores (Neon, Render, Supabase) entregam "postgres://" ou "postgresql://";
+    o SQLAlchemy precisa do driver explícito: "postgresql+psycopg2://"."""
+    for prefixo in ("postgres://", "postgresql://"):
+        if url.startswith(prefixo):
+            return "postgresql+psycopg2://" + url[len(prefixo):]
+    return url
+
+
+DATABASE_URL = _normalizar_url(settings.DATABASE_URL)
+_args = {"check_same_thread": False} if DATABASE_URL.startswith("sqlite") else {}
+engine = create_engine(DATABASE_URL, pool_pre_ping=True, connect_args=_args)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 Base = declarative_base()

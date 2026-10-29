@@ -9,6 +9,8 @@ class Settings(BaseSettings):
     SECRET_KEY: str = "troque-esta-chave-em-producao"
     ACCESS_TOKEN_MINUTES: int = 480
     CORS_ORIGINS: str = "http://localhost:5173,http://127.0.0.1:5173"
+    # Regex opcional de origens extras (ex.: previews do Vercel: https://barberiq.*\.vercel\.app)
+    CORS_ORIGIN_REGEX: str = ""
     AUTO_CREATE_TABLES: bool = True
     TIMEZONE: str = "America/Sao_Paulo"
     # Intervalo (min) do disparo automático de lembretes; 0 desliga

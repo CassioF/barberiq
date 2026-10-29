@@ -1,5 +1,5 @@
 // Cliente HTTP da API FastAPI. O token JWT fica no localStorage.
-const BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000'
+const BASE = (import.meta.env.VITE_API_URL || 'http://localhost:8000').replace(/\/+$/, '')
 const KEY = 'barberiq_token'
 
 export const getToken = () => {

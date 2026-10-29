@@ -1,0 +1,10 @@
+node_modules/
+dist/
+__pycache__/
+*.pyc
+.env
+venv/
+.venv/
+backend/app/ia/modelo_noshow.joblib
+backend/app/ia/modelo_noshow_metricas.json
+.pytest_cache/

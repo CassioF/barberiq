@@ -1,0 +1,16 @@
+# Sobe só o PostgreSQL já com o schema aplicado (equivale ao "docker run" do slide).
+services:
+  db:
+    image: postgres:16
+    container_name: barberiq-db
+    environment:
+      POSTGRES_PASSWORD: senha123
+      POSTGRES_DB: barberiq
+    ports:
+      - "5432:5432"
+    volumes:
+      - barberiq-data:/var/lib/postgresql/data
+      # scripts .sql desta pasta rodam na 1ª inicialização do banco
+      - ./db:/docker-entrypoint-initdb.d:ro
+volumes:
+  barberiq-data:

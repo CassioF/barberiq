@@ -11,6 +11,11 @@ export default function MeusAgendamentos() {
   const carregar = useCallback(() =>
     api.get('/agendamentos', { limit: 200 }).then(setAgs).catch((e) => setErro(e.message)), [])
   useEffect(() => { carregar() }, [carregar])
+  // o assistente de chat avisa quando agenda ou cancela algo
+  useEffect(() => {
+    window.addEventListener('barberiq:agendamentos', carregar)
+    return () => window.removeEventListener('barberiq:agendamentos', carregar)
+  }, [carregar])
 
   const cancelar = async (a) => {
     if (!confirm(`Cancelar ${a.servico.nome} em ${diaMes(a.data_hora)} às ${hora(a.data_hora)}?`)) return

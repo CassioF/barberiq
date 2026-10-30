@@ -12,6 +12,7 @@ import AgendaAdmin from './pages/admin/AgendaAdmin.jsx'
 import Usuarios from './pages/admin/Usuarios.jsx'
 import Servicos from './pages/admin/Servicos.jsx'
 import IA from './pages/admin/IA.jsx'
+import ChatWidget from './ChatWidget.jsx'
 
 const MENUS = {
   cliente: [['/agendar', 'Agendar'], ['/meus-agendamentos', 'Meus agendamentos']],
@@ -37,6 +38,7 @@ function Layout() {
         </div>
       </nav>
       <main className="conteudo"><Outlet /></main>
+      {usuario.tipo === 'cliente' && <ChatWidget />}
     </div>
   )
 }

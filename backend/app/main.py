@@ -15,7 +15,7 @@ from starlette.concurrency import run_in_threadpool
 from app import models, notificacoes  # noqa: F401  (models registra as tabelas)
 from app.config import settings
 from app.database import Base, SessionLocal, engine
-from app.routers import agendamentos, auth, barbeiros, clientes, ia, relatorios, servicos
+from app.routers import agendamentos, auth, barbeiros, chat, clientes, ia, relatorios, servicos
 from app.routers import notificacoes as rota_notificacoes
 
 log = logging.getLogger("barberiq")
@@ -84,7 +84,7 @@ app.add_middleware(
 )
 
 for r in (auth.router, clientes.router, barbeiros.router, barbeiros.disp, servicos.router,
-          agendamentos.router, ia.router, rota_notificacoes.router, relatorios.router):
+          agendamentos.router, ia.router, rota_notificacoes.router, relatorios.router, chat.router):
     app.include_router(r)
 
 

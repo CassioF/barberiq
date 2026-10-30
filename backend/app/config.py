@@ -22,6 +22,9 @@ class Settings(BaseSettings):
     PASSO_AGENDA_MIN: int = 30
     # Risco a partir do qual o agendamento é tratado como "alto risco"
     LIMITE_ALTO_RISCO: float = 0.5
+    # Chatbot com IA (Anthropic). Sem chave, o front usa o modo guiado (botões), sem custo.
+    ANTHROPIC_API_KEY: str = ""
+    CHAT_MODEL: str = "claude-haiku-5-5"
 
 
 settings = Settings()

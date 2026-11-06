@@ -85,7 +85,7 @@ FERRAMENTAS = [
 def _instrucoes(cliente: models.Usuario) -> str:
     agora = tempo.agora()
     return (
-        "Você é o assistente virtual da barbearia AI Barbershop e conversa em português do Brasil, "
+        "Você é o assistente virtual da barbearia BarberShop AI e conversa em português do Brasil, "
         "de forma breve, simpática e objetiva (no máximo 4 frases curtas por resposta).\n"
         f"Agora é {DIAS[agora.weekday()]}, {agora:%d/%m/%Y %H:%M} (horário de Brasília). "
         f"O cliente se chama {cliente.nome.split()[0]}.\n"

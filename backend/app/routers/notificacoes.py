@@ -57,5 +57,5 @@ def definir_whatsapp(dados: schemas.TelefoneIn, db: Session = Depends(get_db),
 def teste(db: Session = Depends(get_db), usuario: models.Usuario = Depends(usuario_atual)):
     return notificacoes.notificar(
         db, usuario, models.TipoNotificacao.confirmacao,
-        f"Olá, {usuario.nome}! 💈 Mensagem de teste do AI Barbershop: suas confirmações chegarão por aqui.",
+        f"Olá, {usuario.nome}! 💈 Mensagem de teste do BarberShop AI: suas confirmações chegarão por aqui.",
     )

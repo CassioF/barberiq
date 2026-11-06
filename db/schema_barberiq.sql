@@ -1,5 +1,5 @@
 -- =====================================================================
--- BarberIQ / AI Barbershop — schema PostgreSQL 16
+-- BarberShop AI — schema PostgreSQL 16
 -- 7 tabelas: usuarios, servicos, disponibilidade_barbeiro, agendamentos,
 --            previsao_noshow, recomendacao_estilo, notificacoes
 -- =====================================================================

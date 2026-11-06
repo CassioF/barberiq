@@ -1,4 +1,4 @@
-# BarberIQ — AI Barbershop
+# BarberShop AI
 
 Plataforma web de agendamento para barbearias com IA para **prever faltas (no-show)**.
 Projeto Integrado II · UNIUBE · Sistemas de Informação.

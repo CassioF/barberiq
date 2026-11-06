@@ -28,7 +28,7 @@ function Layout() {
   return (
     <div className="app">
       <nav className="menu" aria-label="Menu principal">
-        <div className="marca">BarberIQ<small>AI Barbershop</small></div>
+        <div className="marca">BarberShop AI</div>
         {MENUS[usuario.tipo].map(([to, nome]) => (
           <NavLink key={to} to={to} end className={({ isActive }) => `item ${isActive ? 'ativo' : ''}`}>{nome}</NavLink>
         ))}

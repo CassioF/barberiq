@@ -20,7 +20,7 @@ barberiq/
 │   │   ├── models.py schemas.py crud.py   # (mesmo padrão do CRUD de clientes original)
 │   │   ├── agenda.py           # horários livres, conflitos, risco de no-show
 │   │   ├── notificacoes.py     # confirmação / lembrete / lembrete reforçado
-│   │   ├── mensageiros.py      # envio real: Telegram (Bot API) e WhatsApp (Cloud API)
+│   │   ├── mensageiros.py      # envio real pelo WhatsApp (Meta Cloud API)
 │   │   ├── security.py deps.py # bcrypt + JWT + permissões por perfil
 │   │   ├── ia/noshow.py        # modelo de IA
 │   │   ├── routers/            # auth, clientes, barbeiros, servicos, agendamentos, ia, notificacoes, relatorios
@@ -78,7 +78,7 @@ npm run dev               # http://localhost:5173
 ## Decisões e limites (leia antes da apresentação)
 - **UNIQUE parcial**: no slide a restrição é `UNIQUE (barbeiro_id, data_hora)`. Foi implementada como índice único **ignorando cancelados** — senão um horário cancelado nunca poderia ser reaproveitado. O efeito contra duplicidade é o mesmo.
 - **Dados da IA são simulados** (como no escopo). Métricas atuais: acurácia ≈ 87%, AUC ≈ 0,66 — o AUC é modesto porque o ruído do gerador é alto; ajuste `gerar_dados_simulados()` em `ia/noshow.py` se quiser, e rode `python -m app.ia.noshow`.
-- **Telegram e WhatsApp enviam de verdade quando configurados** (veja *Mensagens por Telegram / WhatsApp*). Sem configuração, e sempre no e-mail (sem SMTP), o envio é simulado: log + status *enviado*.
+- **O WhatsApp envia de verdade quando configurado** (veja *Mensagens pelo WhatsApp*). Sem configuração, e sempre no e-mail (sem SMTP), o envio é simulado: log + status *enviado*.
 - **Tabela `recomendacao_estilo`** existe no banco e nos models, mas não há tela/endpoint: o escopo do MVP lista só a análise de risco de falta como modelo de IA (o consultor visagista ficou como diferencial futuro).
 - **Alembic** não foi configurado: o schema vem do `.sql` (ou de `AUTO_CREATE_TABLES=true`, que cria tabelas ausentes pelos models).
 - Não há fluxo de "esqueci a senha" nem pagamento (fora do escopo).
@@ -99,20 +99,14 @@ npm run dev               # http://localhost:5173
 
 > No plano gratuito o Render "dorme" após inatividade (1ª requisição demora ~1 min) e os lembretes automáticos não rodam enquanto ele dorme. Abra o site antes da apresentação e use o botão manual em *IA & Notificações*.
 
-## Mensagens por Telegram / WhatsApp
+## Mensagens pelo WhatsApp
 
-Canal usado em cada notificação: **Telegram** se o cliente conectou o bot → senão **WhatsApp** se tem telefone → senão e-mail (simulado). O status (*enviado* / *falha*) aparece em *IA & Notificações*; falha do provedor nunca impede o agendamento.
+Confirmações, lembretes e cancelamentos vão para o WhatsApp do cliente (ou para o e-mail, simulado, se ele não informou número). O cliente informa ou troca o número em *Meus agendamentos* → **Confirmações pelo WhatsApp**, onde também há **Enviar mensagem de teste**. O status (*enviado* / *falha*) aparece em *IA & Notificações*; falha do WhatsApp nunca impede o agendamento. Sem configuração, o envio é simulado.
 
-**Telegram (grátis, recomendado para a apresentação)**
-1. No Telegram, fale com o **@BotFather** → `/newbot` → copie o *token* e o *username* do bot.
-2. No Render, preencha `TELEGRAM_BOT_TOKEN` e `TELEGRAM_BOT_USERNAME` (o `TELEGRAM_WEBHOOK_SECRET` já é gerado). Aguarde o redeploy.
-3. Entre como admin → *IA & Notificações* → **Configurar webhook do Telegram** (uma vez só).
-4. O cliente vai em *Meus agendamentos* → **Conectar Telegram** → toca em *Iniciar* no bot. Pronto: confirmações, lembretes e cancelamentos chegam lá. O botão **Enviar mensagem de teste** confere.
-
-**WhatsApp (Meta Cloud API)**
 1. Em developers.facebook.com crie um app do tipo *Business* → produto **WhatsApp** → *API Setup*.
-2. Copie o *token* e o *Phone number ID* para `WHATSAPP_TOKEN` e `WHATSAPP_PHONE_NUMBER_ID` no Render. No número de teste da Meta, cadastre os celulares que vão receber (até 5).
-3. Regra do WhatsApp: mensagem livre só é entregue se o cliente falou com o número nas últimas 24h. Para enviar a qualquer momento, crie e aprove um *template* (categoria *Utility*) com corpo `{{1}}` e informe o nome em `WHATSAPP_TEMPLATE`. O token temporário expira em 24h; para algo duradouro gere um token de *System User*.
+2. Copie o *token* e o *Phone number ID* para `WHATSAPP_TOKEN` e `WHATSAPP_PHONE_NUMBER_ID` no Render. No número de teste da Meta, cadastre em *To* os celulares que vão receber (até 5).
+3. Regra do WhatsApp: mensagem livre só é entregue se o cliente falou com o número nas últimas 24h. Para enviar a qualquer momento, crie e aprove um *template* (categoria *Utility*) com corpo `{{1}}` e informe o nome em `WHATSAPP_TEMPLATE` (idioma em `WHATSAPP_TEMPLATE_LANG`, padrão `pt_BR`).
+4. O token temporário expira em 24h; para algo duradouro gere um token permanente de *System User* (Business Settings → System Users).
 
 O telefone é normalizado para o formato internacional (`34999990002` → `5534999990002`).
 

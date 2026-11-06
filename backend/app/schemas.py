@@ -171,11 +171,12 @@ class NotificacaoOut(BaseModel):
 
 class CanaisOut(BaseModel):
     canal_atual: CanalNotificacao
-    telegram_ativo: bool
-    telegram_vinculado: bool
-    telegram_link: Optional[str] = None
     whatsapp_ativo: bool
     telefone: Optional[str] = None
+
+
+class TelefoneIn(BaseModel):
+    telefone: Optional[str] = Field(None, max_length=20, examples=["34999990002"])
 
 
 # --------------------------------------------------------------------- IA ---

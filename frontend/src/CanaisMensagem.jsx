@@ -1,57 +1,53 @@
-// Cartão "Onde receber as confirmações": conecta o Telegram e mostra o canal atual.
-import { useCallback, useEffect, useState } from 'react'
+// Cartão "Confirmações pelo WhatsApp": mostra/edita o número e envia um teste.
+import { useEffect, useState } from 'react'
 import { api } from './api.js'
 import { useToast } from './ui.jsx'
-
-const NOME = { telegram: 'Telegram', whatsapp: 'WhatsApp', email: 'e-mail' }
 
 export default function CanaisMensagem() {
   const avisar = useToast()
   const [c, setC] = useState(null)
-  const [aguardando, setAguardando] = useState(false)
+  const [tel, setTel] = useState('')
+  const [editando, setEditando] = useState(false)
 
-  const carregar = useCallback(() => api.get('/notificacoes/canais').then(setC).catch(() => {}), [])
-  useEffect(() => { carregar() }, [carregar])
-
-  // depois de abrir o bot, confere a cada 3s se o vínculo foi feito (por até 2 min)
   useEffect(() => {
-    if (!aguardando) return
-    let n = 0
-    const t = setInterval(async () => {
-      n += 1
-      const r = await api.get('/notificacoes/canais').catch(() => null)
-      if (r) setC(r)
-      if (r?.telegram_vinculado) { setAguardando(false); avisar('Telegram conectado!') }
-      else if (n >= 40) setAguardando(false)
-    }, 3000)
-    return () => clearInterval(t)
-  }, [aguardando, avisar])
-
+    api.get('/notificacoes/canais').then((r) => { setC(r); setTel(r.telefone || '') }).catch(() => {})
+  }, [])
   if (!c) return null
-  const acao = async (fn, msg) => {
-    try { await fn(); avisar(msg); carregar() } catch (e) { avisar(e.message, 'erro') }
+
+  const salvar = async (e) => {
+    e.preventDefault()
+    try {
+      const r = await api.put('/notificacoes/whatsapp', { telefone: tel || null })
+      setC(r); setEditando(false); avisar('Número salvo.')
+    } catch (err) { avisar(err.message, 'erro') }
+  }
+  const testar = async () => {
+    try {
+      const n = await api.post('/notificacoes/teste')
+      avisar(n.status === 'enviado' ? 'Mensagem de teste enviada.' : 'Não foi possível enviar.', n.status === 'enviado' ? 'ok' : 'erro')
+    } catch (err) { avisar(err.message, 'erro') }
   }
 
   return (
     <div className="card espaco">
-      <h2>Onde receber as confirmações</h2>
-      <p className="suave">
-        Suas confirmações e lembretes vão por <b>{NOME[c.canal_atual]}</b>
-        {c.canal_atual === 'whatsapp' && c.telefone ? ` (${c.telefone})` : ''}.
-      </p>
-      <div className="linha">
-        {c.telegram_ativo && !c.telegram_vinculado && c.telegram_link && (
-          <a className="btn btn-primario" style={{ textDecoration: 'none' }} href={c.telegram_link}
-             target="_blank" rel="noreferrer" onClick={() => setAguardando(true)}>
-            {aguardando ? 'Aguardando o Telegram…' : 'Conectar Telegram'}</a>)}
-        {c.telegram_vinculado && (
-          <button className="btn-pequeno" onClick={() => acao(() => api.del('/notificacoes/telegram'), 'Telegram desconectado.')}>
-            Desconectar Telegram</button>)}
-        <button className="btn-pequeno" onClick={() => acao(() => api.post('/notificacoes/teste'), 'Mensagem de teste enviada.')}>
-          Enviar mensagem de teste</button>
-      </div>
-      {aguardando && <small className="suave" style={{ display: 'block', marginTop: 8 }}>
-        No Telegram, toque em <b>Iniciar</b> (Start) para concluir.</small>}
+      <h2>Confirmações pelo WhatsApp</h2>
+      {editando || !c.telefone ? (
+        <form className="linha" onSubmit={salvar}>
+          <input value={tel} onChange={(e) => setTel(e.target.value)} placeholder="34999990000" inputMode="tel" aria-label="WhatsApp com DDD" />
+          <button className="btn-primario btn-pequeno" type="submit">Salvar</button>
+          {c.telefone && <button className="btn-pequeno" type="button" onClick={() => { setTel(c.telefone); setEditando(false) }}>Cancelar</button>}
+        </form>
+      ) : (
+        <>
+          <p className="suave">Confirmações e lembretes vão para o WhatsApp <b>{c.telefone}</b>.</p>
+          <div className="linha">
+            <button className="btn-pequeno" onClick={() => setEditando(true)}>Trocar número</button>
+            <button className="btn-pequeno" onClick={testar}>Enviar mensagem de teste</button>
+          </div>
+        </>
+      )}
+      {!c.telefone && !editando && <small className="suave" style={{ display: 'block', marginTop: 8 }}>
+        Sem número, você recebe só por e-mail.</small>}
     </div>
   )
 }

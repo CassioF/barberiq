@@ -27,13 +27,7 @@ services:
         value: America/Sao_Paulo
       - key: LEMBRETES_INTERVALO_MIN
         value: "15"
-      # Mensagens reais (opcionais). Vazias = envio simulado. Preencha no painel do Render.
-      - key: TELEGRAM_BOT_TOKEN       # token do @BotFather
-        sync: false
-      - key: TELEGRAM_BOT_USERNAME    # ex.: BarberIQBot
-        sync: false
-      - key: TELEGRAM_WEBHOOK_SECRET
-        generateValue: true
+      # WhatsApp real (opcional). Vazias = envio simulado. Preencha no painel do Render.
       - key: WHATSAPP_TOKEN           # Meta for Developers → WhatsApp → API Setup
         sync: false
       - key: WHATSAPP_PHONE_NUMBER_ID

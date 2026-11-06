@@ -25,10 +25,6 @@ class Settings(BaseSettings):
     # Chatbot com IA (Anthropic). Sem chave, o front usa o modo guiado (botões), sem custo.
     ANTHROPIC_API_KEY: str = ""
     CHAT_MODEL: str = "claude-haiku-5-5"
-    # Telegram (grátis): crie o bot no @BotFather. Sem token, o envio fica simulado.
-    TELEGRAM_BOT_TOKEN: str = ""
-    TELEGRAM_BOT_USERNAME: str = ""  # ex.: BarberIQBot (monta o link de vínculo)
-    TELEGRAM_WEBHOOK_SECRET: str = ""  # opcional: o Telegram envia no header e a API confere
     # WhatsApp Cloud API (Meta). Sem token/ID, o envio fica simulado.
     WHATSAPP_TOKEN: str = ""
     WHATSAPP_PHONE_NUMBER_ID: str = ""

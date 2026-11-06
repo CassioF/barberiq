@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { api, DIAS, dataLonga } from '../../api.js'
 import { Campo, Carregando, Erro, Kpi, useToast } from '../../ui.jsx'
 
-const ROTULO_CANAL = { email: 'E-mail', whatsapp: 'WhatsApp', telegram: 'Telegram' }
+const ROTULO_CANAL = { email: 'E-mail', whatsapp: 'WhatsApp' }
 const ROTULO_TIPO = { confirmacao: 'Confirmação', lembrete: 'Lembrete', lembrete_reforcado: 'Lembrete reforçado', cancelamento: 'Cancelamento' }
 
 export default function IA() {
@@ -67,9 +67,8 @@ export default function IA() {
               <div className="linha espaco">
                 <button disabled={ocupado} onClick={() => acao(() => api.post('/ia/noshow/treinar'), 'Modelo retreinado.')}>Retreinar modelo</button>
                 <button className="btn-primario" disabled={ocupado} onClick={() => acao(() => api.post('/notificacoes/disparar-lembretes'), (r) => `${r.enviados} lembrete(s) enviado(s).`)}>Disparar lembretes agora</button>
-                <button disabled={ocupado} onClick={() => acao(() => api.post('/notificacoes/telegram/configurar-webhook'), 'Webhook do Telegram configurado.')}>Configurar webhook do Telegram</button>
               </div>
-              <small className="suave" style={{ display: 'block', marginTop: 10 }}>Os lembretes também são enviados automaticamente pela API. Telegram e WhatsApp são enviados de verdade quando configurados na API; sem configuração (e no e-mail), o envio é simulado e fica no log.</small>
+              <small className="suave" style={{ display: 'block', marginTop: 10 }}>Os lembretes também são enviados automaticamente pela API. O WhatsApp é enviado de verdade quando a Cloud API está configurada; sem configuração (e no e-mail), o envio é simulado e fica no log.</small>
             </>
           )}
         </div>

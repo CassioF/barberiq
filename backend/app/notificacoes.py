@@ -1,8 +1,8 @@
 """
-Notificações (Telegram / WhatsApp / e-mail).
+Notificações (WhatsApp / e-mail).
 
-Telegram e WhatsApp são enviados de verdade quando o provedor está configurado
-(ver `mensageiros.py`); sem configuração — e para e-mail, que não tem provedor —
+O WhatsApp é enviado de verdade quando a Cloud API está configurada (ver
+`mensageiros.py`); sem configuração — e para e-mail, que não tem provedor —
 o envio é SIMULADO: registra no log e marca como 'enviado'.
 """
 import logging
@@ -20,21 +20,16 @@ CN = models.CanalNotificacao
 
 
 def _enviar(canal: CN, usuario: models.Usuario, mensagem: str) -> bool:
-    if canal == CN.telegram and mensageiros.telegram_ativo() and usuario.telegram_chat_id:
-        mensageiros.enviar_telegram(usuario.telegram_chat_id, mensagem)
-        return True
     if canal == CN.whatsapp and mensageiros.whatsapp_ativo() and usuario.telefone:
         mensageiros.enviar_whatsapp(usuario.telefone, mensagem)
         return True
-    destino = {CN.email: usuario.email, CN.telegram: usuario.telegram_chat_id}.get(canal, usuario.telefone)
+    destino = usuario.email if canal == CN.email else usuario.telefone
     log.info("[%s simulado] -> %s: %s", canal.value, destino or "-", mensagem)
     return True
 
 
 def canal_padrao(usuario: models.Usuario) -> CN:
-    """Telegram se o cliente vinculou o bot; senão WhatsApp se tem telefone; senão e-mail."""
-    if usuario.telegram_chat_id and mensageiros.telegram_ativo():
-        return CN.telegram
+    """WhatsApp quando o usuário tem telefone; senão e-mail."""
     return CN.whatsapp if usuario.telefone else CN.email
 
 

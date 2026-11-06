@@ -1,15 +1,10 @@
 """
-Provedores reais de mensagem: Telegram (Bot API) e WhatsApp (Meta Cloud API).
+Envio real de mensagens pelo WhatsApp (Meta Cloud API).
 
-Cada provedor só é usado quando as variáveis de ambiente dele estão preenchidas;
-sem elas, o envio continua SIMULADO (log) — assim a demo e os testes funcionam
+Só é usado quando WHATSAPP_TOKEN e WHATSAPP_PHONE_NUMBER_ID estão preenchidos;
+sem eles, o envio continua SIMULADO (log) — assim a demo e os testes funcionam
 sem nenhuma conta externa.
-
-Telegram : TELEGRAM_BOT_TOKEN (+ TELEGRAM_BOT_USERNAME para o link de vínculo)
-WhatsApp : WHATSAPP_TOKEN + WHATSAPP_PHONE_NUMBER_ID (+ WHATSAPP_TEMPLATE opcional)
 """
-import hashlib
-import hmac
 import logging
 import re
 
@@ -17,64 +12,14 @@ import httpx
 
 from app.config import settings
 
-log = logging.getLogger("barberiq.mensageiros")
+log = logging.getLogger("barberiq.whatsapp")
 TIMEOUT = httpx.Timeout(10.0)
 
 
 class ErroEnvio(Exception):
-    """O provedor recusou a mensagem (token inválido, número sem WhatsApp...)."""
+    """O WhatsApp recusou a mensagem (token inválido, número sem WhatsApp...)."""
 
 
-# ------------------------------------------------------------------ Telegram ---
-def telegram_ativo() -> bool:
-    return bool(settings.TELEGRAM_BOT_TOKEN)
-
-
-def _tg(metodo: str, **dados) -> dict:
-    url = f"https://api.telegram.org/bot{settings.TELEGRAM_BOT_TOKEN}/{metodo}"
-    r = httpx.post(url, json=dados, timeout=TIMEOUT)
-    corpo = r.json() if r.headers.get("content-type", "").startswith("application/json") else {}
-    if r.status_code != 200 or not corpo.get("ok"):
-        raise ErroEnvio(f"Telegram {metodo}: {corpo.get('description') or r.status_code}")
-    return corpo.get("result") or {}
-
-
-def enviar_telegram(chat_id: str, texto: str) -> None:
-    _tg("sendMessage", chat_id=chat_id, text=texto)
-
-
-def configurar_webhook_telegram(url: str) -> None:
-    dados = {"url": url, "allowed_updates": ["message"]}
-    if settings.TELEGRAM_WEBHOOK_SECRET:
-        dados["secret_token"] = settings.TELEGRAM_WEBHOOK_SECRET
-    _tg("setWebhook", **dados)
-
-
-def _assinatura(usuario_id: int) -> str:
-    chave = settings.SECRET_KEY.encode()
-    return hmac.new(chave, f"tg:{usuario_id}".encode(), hashlib.sha256).hexdigest()[:20]
-
-
-def codigo_vinculo(usuario_id: int) -> str:
-    """Código do link t.me/<bot>?start=<código> (o Telegram aceita só [A-Za-z0-9_-])."""
-    return f"{usuario_id}_{_assinatura(usuario_id)}"
-
-
-def usuario_do_codigo(codigo: str) -> int | None:
-    m = re.fullmatch(r"(\d+)_([0-9a-f]{20})", codigo or "")
-    if not m:
-        return None
-    uid = int(m.group(1))
-    return uid if hmac.compare_digest(m.group(2), _assinatura(uid)) else None
-
-
-def link_vinculo(usuario_id: int) -> str | None:
-    if not settings.TELEGRAM_BOT_USERNAME:
-        return None
-    return f"https://t.me/{settings.TELEGRAM_BOT_USERNAME.lstrip('@')}?start={codigo_vinculo(usuario_id)}"
-
-
-# ------------------------------------------------------------------ WhatsApp ---
 def whatsapp_ativo() -> bool:
     return bool(settings.WHATSAPP_TOKEN and settings.WHATSAPP_PHONE_NUMBER_ID)
 

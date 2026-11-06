@@ -27,6 +27,7 @@ export default function Registro() {
   return (
     <div className="auth">
       <form className="card caixa" onSubmit={enviar}>
+        <img className="logo-auth" src="/logo.jpg" alt="BarberShop AI — agendamento inteligente via WhatsApp" width="200" height="200" />
         <div className="marca">BarberShop AI</div>
         <p className="sub">Crie sua conta de cliente</p>
         <Erro msg={erro} />

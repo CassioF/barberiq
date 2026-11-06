@@ -28,7 +28,7 @@ function Layout() {
   return (
     <div className="app">
       <nav className="menu" aria-label="Menu principal">
-        <div className="marca">BarberShop AI</div>
+        <div className="marca"><img src="/favicon.png" alt="" width="34" height="34" />BarberShop AI</div>
         {MENUS[usuario.tipo].map(([to, nome]) => (
           <NavLink key={to} to={to} end className={({ isActive }) => `item ${isActive ? 'ativo' : ''}`}>{nome}</NavLink>
         ))}

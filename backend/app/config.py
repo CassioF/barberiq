@@ -25,6 +25,12 @@ class Settings(BaseSettings):
     # Chatbot com IA (Anthropic). Sem chave, o front usa o modo guiado (botões), sem custo.
     ANTHROPIC_API_KEY: str = ""
     CHAT_MODEL: str = "claude-haiku-5-5"
+    # WhatsApp Cloud API (Meta). Sem token/ID, o envio fica simulado.
+    WHATSAPP_TOKEN: str = ""
+    WHATSAPP_PHONE_NUMBER_ID: str = ""
+    WHATSAPP_API_VERSION: str = "v21.0"
+    WHATSAPP_TEMPLATE: str = ""  # template aprovado com corpo "{{1}}"; vazio = texto livre
+    WHATSAPP_TEMPLATE_LANG: str = "pt_BR"
 
 
 settings = Settings()

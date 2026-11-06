@@ -169,6 +169,16 @@ class NotificacaoOut(BaseModel):
     enviado_em: Optional[datetime]
 
 
+class CanaisOut(BaseModel):
+    canal_atual: CanalNotificacao
+    whatsapp_ativo: bool
+    telefone: Optional[str] = None
+
+
+class TelefoneIn(BaseModel):
+    telefone: Optional[str] = Field(None, max_length=20, examples=["34999990002"])
+
+
 # --------------------------------------------------------------------- IA ---
 class PrevisaoIn(BaseModel):
     taxa_faltas: float = Field(..., ge=0, le=1, examples=[0.2])

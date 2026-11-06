@@ -27,3 +27,8 @@ services:
         value: America/Sao_Paulo
       - key: LEMBRETES_INTERVALO_MIN
         value: "15"
+      # WhatsApp real (opcional). Vazias = envio simulado. Preencha no painel do Render.
+      - key: WHATSAPP_TOKEN           # Meta for Developers → WhatsApp → API Setup
+        sync: false
+      - key: WHATSAPP_PHONE_NUMBER_ID
+        sync: false

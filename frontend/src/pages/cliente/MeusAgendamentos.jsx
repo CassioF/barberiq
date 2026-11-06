@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { api, dinheiro, diaMes, diaSem, hora, isoDataHora } from '../../api.js'
 import { Carregando, Erro, StatusBadge, Vazio, useToast } from '../../ui.jsx'
+import CanaisMensagem from '../../CanaisMensagem.jsx'
 
 export default function MeusAgendamentos() {
   const avisar = useToast()
@@ -50,6 +51,7 @@ export default function MeusAgendamentos() {
       <div className="lista-ag">
         {historico.length ? historico.map((a) => <Item key={a.id} a={a} />) : <Vazio>Nada por aqui ainda.</Vazio>}
       </div>
+      <CanaisMensagem />
     </>
   )
 }

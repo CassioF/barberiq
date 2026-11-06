@@ -1,5 +1,5 @@
 """
-Ponto de entrada da API — AI Barbershop (BarberIQ).
+Ponto de entrada da API — BarberShop AI.
 
 Rodar:  uvicorn app.main:app --reload
 Docs :  http://localhost:8000/docs
@@ -67,7 +67,7 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(
-    title="AI Barbershop — API",
+    title="BarberShop AI — API",
     description="Agendamento inteligente para barbearias, com previsão de no-show (IA).",
     version="2.0.0",
     lifespan=lifespan,
@@ -90,4 +90,4 @@ for r in (auth.router, clientes.router, barbeiros.router, barbeiros.disp, servic
 
 @app.api_route("/", methods=["GET", "HEAD"], tags=["Status"], summary="Verifica se a API está no ar")
 def raiz():
-    return {"status": "ok", "servico": "AI Barbershop - API"}
+    return {"status": "ok", "servico": "BarberShop AI - API"}

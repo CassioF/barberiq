@@ -27,7 +27,7 @@ export default function Login() {
   return (
     <div className="auth">
       <form className="card caixa" onSubmit={enviar}>
-        <div className="marca">BarberIQ</div>
+        <div className="marca">BarberShop AI</div>
         <p className="sub">Agendamento inteligente para barbearias</p>
         <Erro msg={erro} />
         <Campo rotulo="E-mail"><input type="email" required autoFocus value={email} onChange={(e) => setEmail(e.target.value)} /></Campo>

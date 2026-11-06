@@ -29,6 +29,7 @@ class StatusAgendamento(str, enum.Enum):
 class CanalNotificacao(str, enum.Enum):
     email = "email"
     whatsapp = "whatsapp"
+    telegram = "telegram"
 
 
 class TipoNotificacao(str, enum.Enum):
@@ -56,7 +57,8 @@ class Usuario(Base):
     email = Column(String(150), nullable=False, unique=True, index=True)
     senha_hash = Column(String(255), nullable=False)
     telefone = Column(String(20), nullable=True)
-    tipo = Column(_enum(TipoUsuario, "tipo_usuario"), nullable=False)
+    telegram_chat_id = Column(String(32), nullable=True)  # preenchido ao vincular o bot
+    tipo =Column(_enum(TipoUsuario, "tipo_usuario"), nullable=False)
     ativo = Column(Boolean, nullable=False, default=True, server_default="true")
     criado_em = Column(DateTime, nullable=False, server_default=func.now())
 

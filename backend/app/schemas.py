@@ -169,6 +169,15 @@ class NotificacaoOut(BaseModel):
     enviado_em: Optional[datetime]
 
 
+class CanaisOut(BaseModel):
+    canal_atual: CanalNotificacao
+    telegram_ativo: bool
+    telegram_vinculado: bool
+    telegram_link: Optional[str] = None
+    whatsapp_ativo: bool
+    telefone: Optional[str] = None
+
+
 # --------------------------------------------------------------------- IA ---
 class PrevisaoIn(BaseModel):
     taxa_faltas: float = Field(..., ge=0, le=1, examples=[0.2])

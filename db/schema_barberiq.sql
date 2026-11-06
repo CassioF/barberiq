@@ -6,7 +6,7 @@
 
 CREATE TYPE tipo_usuario        AS ENUM ('cliente', 'barbeiro', 'admin');
 CREATE TYPE status_agendamento  AS ENUM ('confirmado', 'concluido', 'cancelado', 'faltou');
-CREATE TYPE canal_notificacao   AS ENUM ('email', 'whatsapp');
+CREATE TYPE canal_notificacao   AS ENUM ('email', 'whatsapp', 'telegram');
 CREATE TYPE tipo_notificacao    AS ENUM ('confirmacao', 'lembrete', 'lembrete_reforcado', 'cancelamento');
 CREATE TYPE status_notificacao  AS ENUM ('pendente', 'enviado', 'falha');
 
@@ -16,6 +16,7 @@ CREATE TABLE usuarios (
     email       VARCHAR(150) NOT NULL UNIQUE,
     senha_hash  VARCHAR(255) NOT NULL,
     telefone    VARCHAR(20),
+    telegram_chat_id VARCHAR(32),
     tipo        tipo_usuario NOT NULL,
     ativo       BOOLEAN      NOT NULL DEFAULT TRUE,
     criado_em   TIMESTAMP    NOT NULL DEFAULT NOW()

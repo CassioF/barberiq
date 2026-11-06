@@ -1,36 +1,50 @@
 """
-Notificações (e-mail / WhatsApp).
+Notificações (Telegram / WhatsApp / e-mail).
 
-O envio real depende de um provedor externo (SMTP, API do WhatsApp...). Aqui o
-envio é SIMULADO em `_enviar`: registra no log e marca como 'enviado'. Para
-integrar de verdade, basta trocar o corpo de `_enviar`.
+Telegram e WhatsApp são enviados de verdade quando o provedor está configurado
+(ver `mensageiros.py`); sem configuração — e para e-mail, que não tem provedor —
+o envio é SIMULADO: registra no log e marca como 'enviado'.
 """
 import logging
 from datetime import timedelta
 
 from sqlalchemy.orm import Session
 
-from app import models, tempo
+from app import mensageiros, models, tempo
 from app.config import settings
 from app.ia.noshow import nivel
 
 log = logging.getLogger("barberiq.notificacoes")
 TN = models.TipoNotificacao
+CN = models.CanalNotificacao
 
 
-def _enviar(canal: models.CanalNotificacao, usuario: models.Usuario, mensagem: str) -> bool:
-    destino = usuario.email if canal == models.CanalNotificacao.email else (usuario.telefone or "-")
-    log.info("[%s] -> %s: %s", canal.value, destino, mensagem)
+def _enviar(canal: CN, usuario: models.Usuario, mensagem: str) -> bool:
+    if canal == CN.telegram and mensageiros.telegram_ativo() and usuario.telegram_chat_id:
+        mensageiros.enviar_telegram(usuario.telegram_chat_id, mensagem)
+        return True
+    if canal == CN.whatsapp and mensageiros.whatsapp_ativo() and usuario.telefone:
+        mensageiros.enviar_whatsapp(usuario.telefone, mensagem)
+        return True
+    destino = {CN.email: usuario.email, CN.telegram: usuario.telegram_chat_id}.get(canal, usuario.telefone)
+    log.info("[%s simulado] -> %s: %s", canal.value, destino or "-", mensagem)
     return True
+
+
+def canal_padrao(usuario: models.Usuario) -> CN:
+    """Telegram se o cliente vinculou o bot; senão WhatsApp se tem telefone; senão e-mail."""
+    if usuario.telegram_chat_id and mensageiros.telegram_ativo():
+        return CN.telegram
+    return CN.whatsapp if usuario.telefone else CN.email
 
 
 def notificar(
     db: Session, usuario: models.Usuario, tipo: TN, mensagem: str,
     agendamento: models.Agendamento | None = None,
-    canal: models.CanalNotificacao | None = None,
+    canal: CN | None = None,
 ) -> models.Notificacao:
-    if canal is None:  # WhatsApp quando há telefone, senão e-mail
-        canal = models.CanalNotificacao.whatsapp if usuario.telefone else models.CanalNotificacao.email
+    if canal is None:
+        canal = canal_padrao(usuario)
     n = models.Notificacao(
         usuario_id=usuario.id, agendamento_id=agendamento.id if agendamento else None,
         canal=canal, tipo=tipo, mensagem=mensagem[:500],
@@ -52,7 +66,8 @@ def _fmt(ag: models.Agendamento) -> str:
 
 
 def notificar_confirmacao(db: Session, ag: models.Agendamento) -> None:
-    notificar(db, ag.cliente, TN.confirmacao, f"Agendamento confirmado: {_fmt(ag)}.", ag)
+    notificar(db, ag.cliente, TN.confirmacao,
+              f"Olá, {ag.cliente.nome}! ✅ Agendamento confirmado: {_fmt(ag)}. Até lá!", ag)
 
 
 def notificar_cancelamento(db: Session, ag: models.Agendamento) -> None:

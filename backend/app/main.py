@@ -37,6 +37,20 @@ async def _loop_lembretes():
             log.exception("Erro no disparo automático de lembretes")
 
 
+def _migrar():
+    """Ajustes em bancos já existentes (create_all não altera tabelas prontas)."""
+    if engine.dialect.name != "postgresql":
+        return
+    from sqlalchemy import inspect, text
+    insp = inspect(engine)
+    with engine.connect().execution_options(isolation_level="AUTOCOMMIT") as con:
+        tipos = {e["name"] for e in insp.get_enums()}
+        if "canal_notificacao" in tipos:
+            con.execute(text("ALTER TYPE canal_notificacao ADD VALUE IF NOT EXISTS 'telegram'"))
+        if insp.has_table("usuarios"):
+            con.execute(text("ALTER TABLE usuarios ADD COLUMN IF NOT EXISTS telegram_chat_id VARCHAR(32)"))
+
+
 def _seed_se_vazio():
     with SessionLocal() as db:
         if db.query(models.Usuario).first():
@@ -55,6 +69,10 @@ def _seed_seguro():
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    try:
+        _migrar()
+    except Exception:
+        log.exception("Erro ao migrar o banco")
     if settings.AUTO_CREATE_TABLES:
         Base.metadata.create_all(bind=engine)
     if settings.SEED_DEMO:
